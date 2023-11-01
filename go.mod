@@ -1,6 +1,8 @@
-module github.com/hupe1980/golc
+module github.com/white0dew/golc
 
 go 1.20
+
+replace github.com/hupe1980/golc => github.com/white0dew/golc v0.0.0-20231027181329-d00401ac5620
 
 require (
 	cloud.google.com/go/ai v0.1.2
@@ -12,6 +14,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-openapi/strfmt v0.21.7
 	github.com/googleapis/gax-go/v2 v2.12.0
+	github.com/hupe1980/golc v0.0.0-00010101000000-000000000000
 	github.com/sashabaranov/go-openai v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/weaviate/weaviate v1.21.8
@@ -43,7 +46,6 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect
@@ -128,3 +130,5 @@ require (
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/sync v0.4.0
 )
+
+//replace github.com/hupe1980/golc => \Users\13736\Desktop\dev\golc
