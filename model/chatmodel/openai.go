@@ -2,9 +2,7 @@ package chatmodel
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/avast/retry-go"
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/callback"
@@ -126,11 +124,11 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 		CallbackManger: &callback.NoopManager{},
 	}
 
-	for _, v := range messages {
-		resR, _ := json.Marshal(v.Content())
-		fmt.Println(string(resR))
-		fmt.Println(v.Type())
-	}
+	//for _, v := range messages {
+	//	resR, _ := json.Marshal(v.Content())
+	//	fmt.Println(string(resR))
+	//	fmt.Println(v.Type())
+	//}
 
 	for _, fn := range optFns {
 		fn(&opts)
@@ -173,7 +171,7 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 			{
 				Index: 0,
 				Message: openai.ChatCompletionMessage{
-					Role:         "",
+					Role:         openai.ChatMessageRoleAssistant,
 					Content:      "",
 					Name:         "",
 					FunctionCall: nil,
@@ -184,11 +182,12 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 		Usage: openai.Usage{},
 	}
 
+	//resR, _ := json.Marshal(completionRequest)
+	//fmt.Println(string(resR))
+
 	tokenUsage := make(map[string]int)
 	if cm.opts.Stream {
 		completionRequest.Stream = true
-		//havaFunctionCall := false // import 是否出现函数调用
-
 		stream, err := cm.client.CreateChatCompletionStream(ctx, completionRequest)
 		if err != nil {
 			return nil, err
@@ -211,10 +210,12 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 				if err != nil {
 					return nil, err
 				}
+				//resR, _ := json.Marshal(res.Choices)
+				//fmt.Println(string(resR))
 
 				// 防止有空的
 				if len(res.Choices) == 0 {
-					continue
+					return nil, errors.New("系统开小差啦,不知道怎么回答")
 				}
 
 				chatResponse.Choices[0].Message.Content += res.Choices[0].Delta.Content
