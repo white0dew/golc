@@ -16,6 +16,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-openapi/strfmt v0.21.7
 	github.com/googleapis/gax-go/v2 v2.12.0
+	github.com/olahol/melody v1.1.4
 	github.com/sashabaranov/go-openai v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/weaviate/weaviate v1.21.8
@@ -62,6 +63,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.19.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect

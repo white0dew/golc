@@ -11,6 +11,7 @@ import (
 	"github.com/hupe1980/golc/toolkit"
 	"github.com/playwright-community/playwright-go"
 	"log"
+	"os"
 )
 
 func main() {
@@ -30,7 +31,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	openai, err := llm.NewOpenAI("sk-peisUrRs7gPLZKPk3c758475E6604f87B427Df3f4f34Cd45",
+	openai, err := llm.NewOpenAI(os.Getenv("openai_key"),
 		func(o *llm.OpenAIOptions) {
 			o.BaseURL = "https://35.nekoapi.com/v1"
 			o.Stream = true

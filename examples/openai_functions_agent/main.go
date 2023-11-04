@@ -13,6 +13,7 @@ import (
 	"github.com/playwright-community/playwright-go"
 	"github.com/sashabaranov/go-openai"
 	"log"
+	"os"
 )
 
 func main() {
@@ -32,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	openai, err := chatmodel.NewOpenAI("sk-peisUrRs7gPLZKPk3c758475E6604f87B427Df3f4f34Cd45", func(o *chatmodel.OpenAIOptions) {
+	openai, err := chatmodel.NewOpenAI(os.Getenv("openai_key"), func(o *chatmodel.OpenAIOptions) {
 		o.ModelName = openai.GPT3Dot5Turbo16K0613
 		o.BaseURL = "https://35.nekoapi.com/v1"
 		o.Stream = true
