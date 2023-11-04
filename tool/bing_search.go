@@ -46,7 +46,7 @@ func (t *BingWebSearch) Name() string {
 
 // Description returns the description of the tool.
 func (t *BingWebSearch) Description() string {
-	return `BingWebSearch analyzes the keywords inputted by users and ranks web pages based on relevance and weight, in order to present the most relevant and useful search results.`
+	return `BingWebSearch analyzes the keywords inputted by users and ranks web pages based on relevance and weight, in order to present the most relevant and useful search results.Input should be a search query.`
 }
 
 // ArgsType returns the type of the input argument expected by the tool.
