@@ -17,7 +17,8 @@ var _ schema.Tool = (*BingWebSearch)(nil)
 
 // BingSearchOptions contains options for configuring the Human tool.
 type BingSearchOptions struct {
-	Token string `json:"token"`
+	Token   string `json:"token"`
+	RankNum int    `json:"rank_num"`
 }
 
 type BingWebSearch struct {
@@ -26,7 +27,9 @@ type BingWebSearch struct {
 
 // NewBingWebSearch creates a new instance of the Human tool with the provided options.
 func NewBingWebSearch(optFns ...func(o *BingSearchOptions)) *BingWebSearch {
-	opts := BingSearchOptions{}
+	opts := BingSearchOptions{
+		RankNum: 3,
+	}
 
 	for _, fn := range optFns {
 		fn(&opts)
@@ -61,7 +64,7 @@ func (t *BingWebSearch) Run(ctx context.Context, input any) (string, error) {
 		return "", errors.New("illegal input type")
 	}
 
-	searchList, err := t.getBingSearchAPIResult(query, 10)
+	searchList, err := t.getBingSearchAPIResult(query, t.opts.RankNum)
 	if err != nil {
 		return "", err
 	}
@@ -135,7 +138,7 @@ type BingAnswer struct {
 }
 
 // getBingSearchAPIResult
-func (t *BingWebSearch) getBingSearchAPIResult(searchTerm string, answerCount int32) ([]string, error) {
+func (t *BingWebSearch) getBingSearchAPIResult(searchTerm string, answerCount int) ([]string, error) {
 	const endpoint = "https://api.bing.microsoft.com/v7.0/search"
 	// Declare a new GET request.
 	req, err := http.NewRequest("GET", endpoint, nil)
