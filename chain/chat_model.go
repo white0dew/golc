@@ -2,7 +2,6 @@ package chain
 
 import (
 	"context"
-
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/callback"
 	"github.com/hupe1980/golc/model"
@@ -74,6 +73,7 @@ func (c *ChatModel) Call(ctx context.Context, inputs schema.ChainValues, optFns 
 
 	result, err := model.GeneratePrompt(ctx, c.chatModel, pv, func(o *model.Options) {
 		o.Functions = c.functions
+		//o.Callbacks = opts.CallbackManger.GetInheritableCallbacks()
 	})
 	if err != nil {
 		return nil, err

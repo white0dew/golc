@@ -33,6 +33,8 @@ func Call(ctx context.Context, chain schema.Chain, inputs schema.ChainValues, op
 	for _, fn := range optFns {
 		fn(&opts)
 	}
+	fmt.Println("Call-1")
+	fmt.Println(len(opts.Callbacks))
 
 	cm := callback.NewManager(opts.Callbacks, chain.Callbacks(), chain.Verbose(), func(mo *callback.ManagerOptions) {
 		mo.ParentRunID = opts.ParentRunID
@@ -45,6 +47,8 @@ func Call(ctx context.Context, chain schema.Chain, inputs schema.ChainValues, op
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("Call-2")
+	fmt.Println(len(rm.GetInheritableCallbacks()))
 
 	if chain.Memory() != nil {
 		vars, _ := chain.Memory().LoadMemoryVariables(ctx, inputs)

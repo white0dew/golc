@@ -42,6 +42,25 @@ func (cb *StreamWriterHandler) AlwaysVerbose() bool {
 }
 
 func (cb *StreamWriterHandler) OnModelNewToken(ctx context.Context, input *schema.ModelNewTokenInput) error {
-	fmt.Fprint(cb.writer, input.Token)
+	//fmt.Fprint(cb.writer, input.Token)
+	fmt.Println("here new token")
+	return nil
+}
+
+func (cb *StreamWriterHandler) OnToolStart(ctx context.Context, input *schema.ToolStartInput) error {
+	//fmt.Println(input)
+	fmt.Println("here OnToolStart")
+	return nil
+}
+
+func (cb *StreamWriterHandler) OnToolEnd(ctx context.Context, input *schema.ToolEndInput) error {
+	//fmt.Println(input)
+	fmt.Println("here OnToolEnd")
+	return nil
+}
+
+func (cb *StreamWriterHandler) OnToolError(ctx context.Context, input *schema.ToolErrorInput) error {
+	//fmt.Println(input)
+	fmt.Println("here OnToolError")
 	return nil
 }

@@ -15,7 +15,7 @@ type Browser struct {
 // It initializes various schema.Tool objects that facilitate interactions with the browser.
 func NewBrowser(browser playwright.Browser) (*Browser, error) {
 	tools := []schema.Tool{
-		tool.NewCurrentPage(browser),
+		//tool.NewCurrentPage(browser),
 		tool.NewNavigateBrowser(browser),
 		tool.NewExtractText(browser),
 	}

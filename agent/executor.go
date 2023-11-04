@@ -65,6 +65,8 @@ func (e Executor) Call(ctx context.Context, inputs schema.ChainValues, optFns ..
 	for _, fn := range optFns {
 		fn(&opts)
 	}
+	fmt.Println("Call-3")
+	fmt.Println(len(opts.CallbackManger.GetInheritableCallbacks()))
 
 	steps := []schema.AgentStep{}
 
@@ -109,7 +111,9 @@ func (e Executor) Call(ctx context.Context, inputs schema.ChainValues, optFns ..
 					continue
 				}
 
-				observation, err := tool.Run(ctx, t, action.ToolInput)
+				observation, err := tool.Run(ctx, t, action.ToolInput, func(o *tool.Options) {
+					o.Callbacks = opts.CallbackManger.GetInheritableCallbacks()
+				})
 				if err != nil {
 					return nil, err
 				}

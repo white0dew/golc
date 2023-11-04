@@ -3,7 +3,6 @@ package chatmodel
 import (
 	"context"
 	"errors"
-
 	"github.com/avast/retry-go"
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/callback"
@@ -12,6 +11,7 @@ import (
 	"github.com/hupe1980/golc/tokenizer"
 	"github.com/hupe1980/golc/util"
 	"github.com/sashabaranov/go-openai"
+	"io"
 )
 
 // Compile time check to ensure OpenAI satisfies the ChatModel interface.
@@ -20,6 +20,7 @@ var _ schema.ChatModel = (*OpenAI)(nil)
 // OpenAIClient is an interface for the OpenAI chat model client.
 type OpenAIClient interface {
 	CreateChatCompletion(ctx context.Context, request openai.ChatCompletionRequest) (response openai.ChatCompletionResponse, err error)
+	CreateChatCompletionStream(ctx context.Context, request openai.ChatCompletionRequest) (stream *openai.ChatCompletionStream, err error)
 }
 
 // OpenAIOptions contains the options for the OpenAI chat model.
@@ -48,6 +49,8 @@ type OpenAIOptions struct {
 	OrgID string `map:"org_id,omitempty"`
 	// MaxRetries represents the maximum number of retries to make when generating.
 	MaxRetries uint `map:"max_retries,omitempty"`
+	// Stream indicates whether to stream the results or not.
+	Stream bool `map:"stream,omitempty"`
 }
 
 var DefaultOpenAIOptions = OpenAIOptions{
@@ -140,8 +143,7 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 			}
 		})
 	}
-
-	res, err := cm.createChatCompletionWithRetry(ctx, openai.ChatCompletionRequest{
+	completionRequest := openai.ChatCompletionRequest{
 		Model:            cm.opts.ModelName,
 		Temperature:      cm.opts.Temperature,
 		MaxTokens:        cm.opts.MaxTokens,
@@ -152,20 +154,102 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 		Messages:         openAIMessages,
 		Functions:        functions,
 		Stop:             opts.Stop,
-	})
-	if err != nil {
-		return nil, err
+	}
+
+	chatResponse := openai.ChatCompletionResponse{
+		ID:      "",
+		Object:  "",
+		Created: 0,
+		Model:   "",
+		Choices: []openai.ChatCompletionChoice{
+			{
+				Index: 0,
+				Message: openai.ChatCompletionMessage{
+					Role:         "",
+					Content:      "",
+					Name:         "",
+					FunctionCall: nil,
+				},
+				FinishReason: "",
+			},
+		},
+		Usage: openai.Usage{},
 	}
 
 	tokenUsage := make(map[string]int)
-	tokenUsage["CompletionTokens"] += res.Usage.CompletionTokens
-	tokenUsage["PromptTokens"] += res.Usage.PromptTokens
-	tokenUsage["TotalTokens"] += res.Usage.TotalTokens
+	if cm.opts.Stream {
+		completionRequest.Stream = true
+		//havaFunctionCall := false // import 是否出现函数调用
+
+		stream, err := cm.client.CreateChatCompletionStream(ctx, completionRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		defer stream.Close()
+		tokens := []string{}
+
+	streamProcessing:
+		for {
+			select {
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			default:
+				res, err := stream.Recv()
+				if errors.Is(err, io.EOF) {
+					break streamProcessing
+				}
+
+				if err != nil {
+					return nil, err
+				}
+
+				// 防止有空的
+				if len(res.Choices) == 0 {
+					continue
+				}
+
+				chatResponse.Choices[0].Message.Content += res.Choices[0].Delta.Content
+				if res.Choices[0].Delta.Role != "" {
+					chatResponse.Choices[0].Message.Role = res.Choices[0].Delta.Role
+				}
+
+				chatResponse.Choices[0].Index = res.Choices[0].Index
+				chatResponse.Choices[0].FinishReason = res.Choices[0].FinishReason
+
+				if res.Choices[0].Delta.FunctionCall != nil {
+					if chatResponse.Choices[0].Message.FunctionCall == nil {
+						chatResponse.Choices[0].Message.FunctionCall = res.Choices[0].Delta.FunctionCall
+					} else {
+						chatResponse.Choices[0].Message.FunctionCall.Arguments += res.Choices[0].Delta.FunctionCall.Arguments
+					}
+				}
+
+				if err := opts.CallbackManger.OnModelNewToken(ctx, &schema.ModelNewTokenManagerInput{
+					Token:  res.Choices[0].Delta.Content,
+					Choice: chatResponse.Choices,
+				}); err != nil {
+					return nil, err
+				}
+				tokens = append(tokens, res.Choices[0].Delta.Content)
+			}
+		}
+	} else {
+		res, err := cm.createChatCompletionWithRetry(ctx, completionRequest)
+		if err != nil {
+			return nil, err
+		}
+		chatResponse = res
+		// stream-需要重新计算
+		tokenUsage["CompletionTokens"] += chatResponse.Usage.CompletionTokens
+		tokenUsage["PromptTokens"] += chatResponse.Usage.PromptTokens
+		tokenUsage["TotalTokens"] += chatResponse.Usage.TotalTokens
+	}
 
 	return &schema.ModelResult{
 		Generations: []schema.Generation{{
-			Text:    res.Choices[0].Message.Content,
-			Message: openAIResponseToChatMessage(res.Choices[0].Message),
+			Text:    chatResponse.Choices[0].Message.Content,
+			Message: openAIResponseToChatMessage(chatResponse.Choices[0].Message),
 		}},
 		LLMOutput: map[string]any{
 			"ModelName":  cm.opts.ModelName,

@@ -1,6 +1,9 @@
 package schema
 
-import "context"
+import (
+	"context"
+	"github.com/sashabaranov/go-openai"
+)
 
 type LLMStartManagerInput struct {
 	LLMType          string
@@ -25,7 +28,8 @@ type ChatModelStartInput struct {
 }
 
 type ModelNewTokenManagerInput struct {
-	Token string
+	Token  string
+	Choice []openai.ChatCompletionChoice
 }
 
 type ModelNewTokenInput struct {

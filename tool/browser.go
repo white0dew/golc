@@ -90,12 +90,15 @@ func (t *ExtractText) ArgsType() reflect.Type {
 
 // Run executes the tool with the given input and returns the output.
 func (t *ExtractText) Run(ctx context.Context, input any) (string, error) {
+	//return "我是中国的百度百科", nil
 	page, err := getCurrentPage(t.browser)
+	fmt.Println("ExtractText getCurrentPage")
 	if err != nil {
 		return "", err
 	}
 
 	html, err := page.Content()
+	fmt.Println("ExtractText html")
 	if err != nil {
 		return "", err
 	}

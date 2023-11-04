@@ -3,6 +3,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hupe1980/golc/callback"
 	"github.com/hupe1980/golc/schema"
@@ -34,6 +35,7 @@ func LLMGenerate(ctx context.Context, model schema.LLM, prompt string, optFns ..
 	for _, fn := range optFns {
 		fn(&opts)
 	}
+	fmt.Println(opts.Callbacks)
 
 	cm := callback.NewManager(opts.Callbacks, model.Callbacks(), model.Verbose(), func(mo *callback.ManagerOptions) {
 		mo.ParentRunID = opts.ParentRunID

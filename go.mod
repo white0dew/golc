@@ -2,7 +2,8 @@ module github.com/white0dew/golc
 
 go 1.20
 
-replace github.com/hupe1980/golc => github.com/white0dew/golc v0.0.0-20231027181329-d00401ac5620
+//replace github.com/hupe1980/golc => github.com/white0dew/golc v0.0.0-20231027181329-d00401ac5620
+replace github.com/hupe1980/golc => ./
 
 require (
 	cloud.google.com/go/ai v0.1.2
@@ -130,5 +131,3 @@ require (
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/sync v0.4.0
 )
-
-//replace github.com/hupe1980/golc => \Users\13736\Desktop\dev\golc

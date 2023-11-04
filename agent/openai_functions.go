@@ -95,8 +95,11 @@ func (a *OpenAIFunctions) Plan(ctx context.Context, intermediateSteps []schema.A
 		return nil, nil, err
 	}
 
+	fmt.Println("Call-4")
+	fmt.Println(len(a.model.Callbacks()))
 	result, err := model.ChatModelGenerate(ctx, a.model, prompt.Messages(), func(o *model.Options) {
 		o.Functions = a.functions
+		//o.Callbacks = a.model.Callbacks()
 	})
 	if err != nil {
 		return nil, nil, err
