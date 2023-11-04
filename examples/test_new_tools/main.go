@@ -12,13 +12,13 @@ import (
 	"github.com/hupe1980/golc/tool"
 	"github.com/sashabaranov/go-openai"
 	"log"
-	"os"
 )
 
 func main() {
 	golc.Verbose = true
 
-	openai, err := chatmodel.NewOpenAI(os.Getenv("openai_key"), func(o *chatmodel.OpenAIOptions) {
+	// os.Getenv("openai_key")
+	openai, err := chatmodel.NewOpenAI("sk-peisUrRs7gPLZKPk3c758475E6604f87B427Df3f4f34Cd45", func(o *chatmodel.OpenAIOptions) {
 		o.ModelName = openai.GPT3Dot5Turbo16K0613
 		o.BaseURL = "https://35.pixelmoe.com/v1"
 		o.Stream = true
@@ -33,11 +33,13 @@ func main() {
 
 	// 历史的回答记录
 	extraMessages := []prompt.MessageTemplate{
-		prompt.NewHumanMessageTemplate("请用中文回答最后的答案"),
+		prompt.NewHumanMessageTemplate("使用必应搜索百度信息"),
 	}
 
 	agent, err := agent.NewOpenAIFunctions(openai, []schema.Tool{
-		tool.NewBaiduHot(),
+		tool.NewBingWebSearch(func(o *tool.BingSearchOptions) {
+			o.Token = "2e077f03e92140b583f7a81837ee35e9"
+		}),
 	}, func(o *agent.OpenAIFunctionsOptions) {
 		o.CallbackOptions.Callbacks = []schema.Callback{callback.NewStreamWriterHandler()}
 		o.ExtraMessages = extraMessages

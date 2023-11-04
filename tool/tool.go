@@ -76,6 +76,7 @@ func ToFunction(t schema.Tool) (*schema.FunctionDefinition, error) {
 
 	argsType := t.ArgsType()
 
+	// TODO fixed
 	if argsType.Kind() == reflect.String {
 		function.Parameters = schema.FunctionDefinitionParameters{
 			Type: "object",

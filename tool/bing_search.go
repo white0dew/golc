@@ -24,7 +24,7 @@ type BingWebSearch struct {
 	opts BingSearchOptions
 }
 
-// NewBingSearch creates a new instance of the Human tool with the provided options.
+// NewBingWebSearch creates a new instance of the Human tool with the provided options.
 func NewBingWebSearch(optFns ...func(o *BingSearchOptions)) *BingWebSearch {
 	opts := BingSearchOptions{}
 
@@ -46,7 +46,7 @@ func (t *BingWebSearch) Name() string {
 
 // Description returns the description of the tool.
 func (t *BingWebSearch) Description() string {
-	return `必应是由微软公司开发的一款综合性搜索引擎和互联网门户网站，可以根据用户给定的关键词获取对应的网络信息。`
+	return `BingWebSearch analyzes the keywords inputted by users and ranks web pages based on relevance and weight, in order to present the most relevant and useful search results.`
 }
 
 // ArgsType returns the type of the input argument expected by the tool.

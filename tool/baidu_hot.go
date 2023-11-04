@@ -14,11 +14,7 @@ var _ schema.Tool = (*BaiduHot)(nil)
 
 // BaiduHotOptions contains options for configuring the Human tool.
 type BaiduHotOptions struct {
-	// Function for displaying prompts.
-	PromptFunc PromptFunc
-
-	// Function for retrieving user input.
-	InputFunc InputFunc
+	RankNum int `json:"rank_num"`
 }
 
 // BaiduHot is a tool that allows interaction with a human user.
@@ -28,7 +24,9 @@ type BaiduHot struct {
 
 // NewBaiduHot creates a new instance of the Human tool with the provided options.
 func NewBaiduHot(optFns ...func(o *BaiduHotOptions)) *BaiduHot {
-	opts := BaiduHotOptions{}
+	opts := BaiduHotOptions{
+		RankNum: 3,
+	}
 
 	for _, fn := range optFns {
 		fn(&opts)
@@ -43,12 +41,12 @@ func NewBaiduHot(optFns ...func(o *BaiduHotOptions)) *BaiduHot {
 
 // Name returns the name of the tool.
 func (t *BaiduHot) Name() string {
-	return "BaiduHot"
+	return "BaiduHotNews"
 }
 
 // Description returns the description of the tool.
 func (t *BaiduHot) Description() string {
-	return `返回当前百度网站的新闻热点热榜`
+	return `BaiduHotNews is based on the massive real data from hundreds of millions of users and utilizes professional data mining methods to provide the current ranking of search hotspots on the Baidu website.`
 }
 
 // ArgsType returns the type of the input argument expected by the tool.
@@ -68,7 +66,19 @@ func (t *BaiduHot) Run(ctx context.Context, input any) (string, error) {
 		return "", err
 	}
 
-	res, err := json.Marshal(baiduList)
+	if len(baiduList) == 0 {
+		return "当前百度热点榜为空", nil
+	}
+
+	newBaiduList := make([]HotItem, 0)
+	for k, v := range baiduList {
+		if k > t.opts.RankNum {
+			break
+		}
+		newBaiduList = append(newBaiduList, v)
+	}
+
+	res, err := json.Marshal(newBaiduList)
 	if err != nil {
 		return "", err
 	}
