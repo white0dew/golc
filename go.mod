@@ -1,9 +1,10 @@
-module github.com/white0dew/golc
+module github.com/hupe1980/golc
 
 go 1.20
 
-//replace github.com/hupe1980/golc => github.com/white0dew/golc v0.0.0-20231027181329-d00401ac5620
-replace github.com/hupe1980/golc => ./
+//replace github.com/hupe1980/golc => github.com/white0dew/golc v0.1.1-0.20231104075637-3e54dbefd0bd
+
+//replace github.com/hupe1980/golc => ./
 
 require (
 	cloud.google.com/go/ai v0.1.2
@@ -15,7 +16,6 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-openapi/strfmt v0.21.7
 	github.com/googleapis/gax-go/v2 v2.12.0
-	github.com/hupe1980/golc v0.0.0-00010101000000-000000000000
 	github.com/sashabaranov/go-openai v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/weaviate/weaviate v1.21.8
