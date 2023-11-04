@@ -18,6 +18,8 @@ func ToOpenAIChatCompletionMessages(messages schema.ChatMessages) ([]openai.Chat
 			return nil, err
 		}
 
+		// TODO 清除是否要clear空的
+
 		if functionMessage, ok := message.(*schema.FunctionChatMessage); ok {
 			openAIMessages = append(openAIMessages, openai.ChatCompletionMessage{
 				Role:    role,

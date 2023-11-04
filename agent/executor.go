@@ -65,8 +65,8 @@ func (e Executor) Call(ctx context.Context, inputs schema.ChainValues, optFns ..
 	for _, fn := range optFns {
 		fn(&opts)
 	}
-	fmt.Println("Call-3")
-	fmt.Println(len(opts.CallbackManger.GetInheritableCallbacks()))
+	//fmt.Println("Call-3")
+	//fmt.Println(len(opts.CallbackManger.GetInheritableCallbacks()))
 
 	steps := []schema.AgentStep{}
 

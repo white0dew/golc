@@ -2,7 +2,9 @@ package chatmodel
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/avast/retry-go"
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/callback"
@@ -122,6 +124,12 @@ func NewOpenAIFromClient(client OpenAIClient, optFns ...func(o *OpenAIOptions)) 
 func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, optFns ...func(o *schema.GenerateOptions)) (*schema.ModelResult, error) {
 	opts := schema.GenerateOptions{
 		CallbackManger: &callback.NoopManager{},
+	}
+
+	for _, v := range messages {
+		resR, _ := json.Marshal(v.Content())
+		fmt.Println(string(resR))
+		fmt.Println(v.Type())
 	}
 
 	for _, fn := range optFns {

@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/agent"
 	"github.com/hupe1980/golc/callback"
 	"github.com/hupe1980/golc/model/chatmodel"
+	"github.com/hupe1980/golc/prompt"
 	"github.com/hupe1980/golc/schema"
 	"github.com/hupe1980/golc/toolkit"
 	"github.com/playwright-community/playwright-go"
@@ -14,7 +16,7 @@ import (
 )
 
 func main() {
-	golc.Verbose = true
+	golc.Verbose = false
 
 	//if err := playwright.Install(); err != nil {
 	//	log.Fatal(err)
@@ -48,15 +50,22 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// 历史的回答记录
+	extraMessages := []prompt.MessageTemplate{
+		prompt.NewSystemMessageTemplate("You are a world class algorithm for extracting information in structured formats."),
+		prompt.NewHumanMessageTemplate("请用中文回答最后的答案"),
+	}
+
 	agent, err := agent.NewOpenAIFunctions(openai, browserKit.Tools(), func(o *agent.OpenAIFunctionsOptions) {
 		o.MaxIterations = 10
 		o.CallbackOptions.Callbacks = []schema.Callback{callback.NewStreamWriterHandler()}
+		o.ExtraMessages = extraMessages
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = golc.SimpleCall(context.Background(), agent, "Navigate to https://yqsas.com/2019/03/21/how-to-develop-forked-go-project/ and summarize the text",
+	result, err := golc.SimpleCall(context.Background(), agent, "Navigate to https://yqsas.com/2019/03/21/how-to-develop-forked-go-project/ and summarize the text",
 		func(options *golc.SimpleCallOptions) {
 			options.Callbacks = []schema.Callback{
 				callback.NewStreamWriterHandler(),
@@ -66,5 +75,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//fmt.Println(result)
+	fmt.Println(result)
 }
