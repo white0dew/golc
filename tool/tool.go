@@ -50,7 +50,8 @@ func Run(ctx context.Context, t schema.Tool, input *schema.ToolInput, optFns ...
 	output, err := t.Run(ctx, inputValue)
 	if err != nil {
 		if cbErr := rm.OnToolError(ctx, &schema.ToolErrorManagerInput{
-			Error: err,
+			Error:    err,
+			ToolName: t.Name(),
 		}); cbErr != nil {
 			return "", cbErr
 		}
@@ -59,7 +60,8 @@ func Run(ctx context.Context, t schema.Tool, input *schema.ToolInput, optFns ...
 	}
 
 	if err := rm.OnToolEnd(ctx, &schema.ToolEndManagerInput{
-		Output: output,
+		Output:   output,
+		ToolName: t.Name(),
 	}); err != nil {
 		return "", err
 	}
