@@ -112,7 +112,8 @@ type ToolStartInput struct {
 }
 
 type ToolEndManagerInput struct {
-	Output string
+	Output   string
+	ToolName string
 }
 
 type ToolEndInput struct {
@@ -121,7 +122,8 @@ type ToolEndInput struct {
 }
 
 type ToolErrorManagerInput struct {
-	Error error
+	Error    error
+	ToolName string
 }
 
 type ToolErrorInput struct {

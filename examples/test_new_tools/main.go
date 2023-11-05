@@ -36,10 +36,12 @@ func main() {
 		prompt.NewHumanMessageTemplate("使用必应搜索百度信息"),
 	}
 
+	//tool.NewBingWebSearch(func(o *tool.BingSearchOptions) {
+	//	o.Token = "2e077f03e92140b583f7a81837ee35e9"
+	//}
+
 	agent, err := agent.NewOpenAIFunctions(openai, []schema.Tool{
-		tool.NewBingWebSearch(func(o *tool.BingSearchOptions) {
-			o.Token = "2e077f03e92140b583f7a81837ee35e9"
-		}),
+		tool.NewChengYuDict(),
 	}, func(o *agent.OpenAIFunctionsOptions) {
 		o.CallbackOptions.Callbacks = []schema.Callback{callback.NewStreamWriterHandler()}
 		o.ExtraMessages = extraMessages
@@ -48,7 +50,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	result, err := golc.SimpleCall(context.Background(), agent, "现在的百度热榜是什么?简单总结一下",
+	result, err := golc.SimpleCall(context.Background(), agent, "查询成语的意思：百尺竿头",
 		func(options *golc.SimpleCallOptions) {
 			options.Callbacks = []schema.Callback{
 				callback.NewStreamWriterHandler(),
