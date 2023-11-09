@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/hupe1980/golc/schema"
 	"io"
 	"net/http"
@@ -177,6 +178,8 @@ func (t *BingWebSearch) getBingSearchAPIResult(searchTerm string, answerCount in
 	if err != nil {
 		return nil, err
 	}
+	resR, _ := json.Marshal(ans)
+	fmt.Println(string(resR))
 	var res []string
 	for _, result := range ans.WebPages.Value {
 		res = append(res, result.Snippet)

@@ -10,7 +10,6 @@ import (
 	"github.com/hupe1980/golc/prompt"
 	"github.com/hupe1980/golc/schema"
 	"github.com/hupe1980/golc/tool"
-	"github.com/sashabaranov/go-openai"
 	"log"
 )
 
@@ -19,8 +18,8 @@ func main() {
 
 	// os.Getenv("openai_key")
 	openai, err := chatmodel.NewOpenAI("sk-peisUrRs7gPLZKPk3c758475E6604f87B427Df3f4f34Cd45", func(o *chatmodel.OpenAIOptions) {
-		o.ModelName = openai.GPT3Dot5Turbo16K0613
-		o.BaseURL = "https://35.pixelmoe.com/v1"
+		o.ModelName = "gpt-3.5-turbo-1106"
+		o.BaseURL = "https://35.nekoapi.com/v1"
 		o.Stream = true
 		o.MaxTokens = 2000
 		o.CallbackOptions.Callbacks = []schema.Callback{
@@ -41,7 +40,9 @@ func main() {
 	//}
 
 	agent, err := agent.NewOpenAIFunctions(openai, []schema.Tool{
-		tool.NewChengYuDict(),
+		tool.NewBingWebSearch(func(o *tool.BingSearchOptions) {
+			o.Token = "2e077f03e92140b583f7a81837ee35e9"
+		}),
 	}, func(o *agent.OpenAIFunctionsOptions) {
 		o.CallbackOptions.Callbacks = []schema.Callback{callback.NewStreamWriterHandler()}
 		o.ExtraMessages = extraMessages
@@ -50,7 +51,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	result, err := golc.SimpleCall(context.Background(), agent, "查询成语的意思：百尺竿头",
+	result, err := golc.SimpleCall(context.Background(), agent, "查询新闻",
 		func(options *golc.SimpleCallOptions) {
 			options.Callbacks = []schema.Callback{
 				callback.NewStreamWriterHandler(),
