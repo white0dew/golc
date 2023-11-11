@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/hupe1980/golc/rag"
 
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/model"
@@ -19,17 +20,20 @@ var _ schema.Agent = (*OpenAIFunctions)(nil)
 type OpenAIFunctionsOptions struct {
 	*schema.CallbackOptions
 	// OutputKey is the key to store the output of the agent in the ChainValues.
-	OutputKey     string
-	SystemMessage *prompt.SystemMessageTemplate
-	ExtraMessages []prompt.MessageTemplate
-	MaxIterations int
+	OutputKey                 string
+	SystemMessage             *prompt.SystemMessageTemplate
+	ExtraMessages             []prompt.MessageTemplate
+	MaxIterations             int
+	RetrievalQAOptionsOptions *rag.RetrievalQAOptions
+	Retriever                 schema.Retriever
 }
 
 // OpenAIFunctions is an agent that uses OpenAI chatModels and schema.Tools to perform actions.
 type OpenAIFunctions struct {
 	model     schema.ChatModel
-	functions []schema.FunctionDefinition
+	functions []schema.FunctionDefinition // 插件系统
 	opts      OpenAIFunctionsOptions
+	retriever schema.Retriever // 知识库查询
 }
 
 // NewOpenAIFunctions creates a new instance of the OpenAIFunctions agent with the given model and tools.
@@ -53,8 +57,8 @@ func NewOpenAIFunctions(model schema.ChatModel, tools []schema.Tool, optFns ...f
 		return nil, errors.New("agent only supports OpenAI chatModels")
 	}
 
+	// 插件系统
 	functions := make([]schema.FunctionDefinition, len(tools))
-
 	for i, t := range tools {
 		f, err := tool.ToFunction(t)
 		if err != nil {
@@ -89,12 +93,10 @@ func (a *OpenAIFunctions) Plan(ctx context.Context, intermediateSteps []schema.A
 	placeholder := prompt.NewMessagesPlaceholder("agentScratchpad")
 
 	wrapper := prompt.NewChatTemplateWrapper(chatTemplate, placeholder)
-
 	prompt, err := wrapper.FormatPrompt(inputs)
 	if err != nil {
 		return nil, nil, err
 	}
-	//
 	//fmt.Println("Call-4")
 	//fmt.Println(len(a.model.Callbacks()))
 	result, err := model.ChatModelGenerate(ctx, a.model, prompt.Messages(), func(o *model.Options) {

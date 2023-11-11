@@ -89,6 +89,7 @@ func (baid *Baidu) Search(query core.Query) ([]core.SearchResult, error) {
 	}
 
 	page := baid.Navigate(url)
+	page.Info()
 
 	results, err := page.Timeout(baid.Timeout).Search("div.c-container.new-pmd")
 	if err != nil {

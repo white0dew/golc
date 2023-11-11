@@ -9,7 +9,6 @@ import (
 	"github.com/hupe1980/golc/model/chatmodel"
 	"github.com/hupe1980/golc/prompt"
 	"github.com/hupe1980/golc/schema"
-	"github.com/hupe1980/golc/tool"
 	"log"
 )
 
@@ -35,14 +34,10 @@ func main() {
 		prompt.NewHumanMessageTemplate("使用必应搜索百度信息"),
 	}
 
-	//tool.NewBingWebSearch(func(o *tool.BingSearchOptions) {
-	//	o.Token = "2e077f03e92140b583f7a81837ee35e9"
-	//}
-
 	agent, err := agent.NewOpenAIFunctions(openai, []schema.Tool{
-		tool.NewBingWebSearch(func(o *tool.BingSearchOptions) {
-			o.Token = "2e077f03e92140b583f7a81837ee35e9"
-		}),
+		//tool.NewBingWebSearch(func(o *tool.BingSearchOptions) {
+		//	o.Token = "2e077f03e92140b583f7a81837ee35e9"
+		//})
 	}, func(o *agent.OpenAIFunctionsOptions) {
 		o.CallbackOptions.Callbacks = []schema.Callback{callback.NewStreamWriterHandler()}
 		o.ExtraMessages = extraMessages
@@ -51,7 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	result, err := golc.SimpleCall(context.Background(), agent, "查询新闻",
+	result, err := golc.SimpleCall(context.Background(), agent, nil,
 		func(options *golc.SimpleCallOptions) {
 			options.Callbacks = []schema.Callback{
 				callback.NewStreamWriterHandler(),

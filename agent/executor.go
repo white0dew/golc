@@ -70,6 +70,10 @@ func (e Executor) Call(ctx context.Context, inputs schema.ChainValues, optFns ..
 
 	steps := []schema.AgentStep{}
 
+	// 知识库提前调用
+	//if e.agent
+
+	// 插件使用
 	for i := 0; i <= e.opts.MaxIterations; i++ {
 		select {
 		case <-ctx.Done():
