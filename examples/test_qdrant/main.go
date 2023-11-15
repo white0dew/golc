@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/hupe1980/golc/embedding"
-	"github.com/hupe1980/golc/schema"
 	"github.com/hupe1980/golc/vectorstore"
 	pb "github.com/qdrant/go-client/qdrant"
 	"google.golang.org/grpc"
@@ -312,7 +311,8 @@ func main1() {
 }
 
 func main() {
-	openai, err := embedding.NewOpenAI("", func(o *embedding.OpenAIOptions) {
+	openai, err := embedding.NewOpenAI("sk-peisUrRs7gPLZKPk3c758475E6604f87B427Df3f4f34Cd45", func(o *embedding.OpenAIOptions) {
+		o.BaseURL = "https://35.nekoapi.com/v1"
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -321,19 +321,19 @@ func main() {
 	qdrant, err := vectorstore.NewQdrant(openai, "text", func(options *vectorstore.QdrantOptions) {
 		options.GroupId = 1
 		options.TopK = 3
-		options.AddrPort = ""
-		options.CollectionName = ""
+		options.AddrPort = "aistar.cool:6334"
+		options.CollectionName = "aistar"
 		options.ScoreThreshold = 0.1
 	})
-	err = qdrant.AddDocuments(context.Background(), []schema.Document{{
-		PageContent: "你还记得我吗？",
-		Metadata:    nil,
-	}})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	//err = qdrant.AddDocuments(context.Background(), []schema.Document{{
+	//	PageContent: "import requests\nimport chardet\nimport json\nurl = \"http://172.20.81.210:8000/api/chat\"\n\n\n\nheaders = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": \"Bearer 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\"\n}\n\ndata = {\n    \"max_tokens\": 50,\n    \"stop\": [\"\\n\"],\n    \"temperature\": 0.5,\n    \"model\":\"gpt-3.5-turbo\",\n    \"messages\": [{\"role\": \"user\", \"content\": \"Hello!write 1000字论文呢\"}],\n    print(json.loads(event))\n\n# import gzip\n\n# # 原始字节字符串\n# compressed_data = b'\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x03T\\x8e\\xdbJ\\x031\\x14E\\xdf\\xfd\\x8a\\xb8\\x9f3e\\xc6j[\\xf3\"\\x14\\x84*\\x08\\x8a\\n^\\x90\\x92&\\xc7Nj&g\\x9c\\x9c\\xa2\\xb5\\xcc\\xbfK\\xf1\\x86\\xaf\\x8b\\xbd\\x17k\\x8b\\xe0a\\xe0j+\\xaeic1\\x1e\\xdd\\xf0\\xaa:\\xbd\\x7fX\\xc6\\xe1\\xeb\\xc5\\xdd\\xd5\\xed\\xe5\\xf4z\\xea?\\xc8\\xf3y\\x1d\\xa0\\xc1\\x8b\\x159\\xf9~\\x0c\\x1c7m$\\t\\x9c\\xa0\\xe1:\\xb2B\\x1e\\xa6\\x1aM\\xaa\\xf1xr|Xi4\\xec)\\xc2`\\xd9J1\\x1c\\x1c\\x15\\xb2\\xee\\x16\\\\\\x94\\xc3\\xb2\\x82\\xc6:\\xdb%\\xc1l\\xd1v\\xdc\\xb42\\x17~\\xa1\\x94a\\xaaR\\xe3O\\xfd\\x0f\\x0b\\x8b\\x8d\\xbf\\xe4\\xa0\\xec5\\\\\\xcd\\xc1Q\\x86y\\xdc\\xa2\\xa1\\xfc\\xe3\\xec8\\x12\\x0cl\\xce!\\x8bM\\xb2+\\xe4$\\x94v\\xf53\\x8a\\x91\\x95\\xd4\\xd4\\xd1\\xbe\\x9a\\xf1\\x9br6\\xa93\\xf55V\\x1b^+ao7\\'\\xe85\\x9eC\\n\\xb9\\x9ewd3\\'\\x18d\\xe1\\x16\\x1a!yz\\x87)\\xfb\\xa7~\\xef\\x13\\x00\\x00\\xff\\xff\\x03\\x00\\xa1\\x89W\\xd5F\\x01\\x00\\x00'# 解压缩字节数据并将其解码为文本\n# decoded_data = gzip.decompress(compressed_data).decode('utf-8')\n\n# print(decoded_data) map[title:test.py]}",
+	//	Metadata:    nil,
+	//}})
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
 
-	res, err := qdrant.SimilaritySearch(context.Background(), "你还记得我吗？")
+	res, err := qdrant.SimilaritySearch(context.Background(), "白嫖云电脑注册教程")
 	fmt.Println(res)
 }

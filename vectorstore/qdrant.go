@@ -145,6 +145,20 @@ func (q Qdrant) SimilaritySearch(ctx context.Context, query string) ([]schema.Do
 					},
 				},
 			},
+			Should: []*pb.Condition{
+				{
+					ConditionOneOf: &pb.Condition_Field{
+						Field: &pb.FieldCondition{
+							Key: "md5",
+							Match: &pb.Match{
+								MatchValue: &pb.Match_Keywords{
+									Keywords: &pb.RepeatedStrings{Strings: []string{"345418557abc9fd665f6679e1cbf4db9", "ff77b2c1cf775c80e751ac328d1ba2ab"}},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		Limit:          q.opts.TopK,
 		WithPayload:    &pb.WithPayloadSelector{SelectorOptions: &pb.WithPayloadSelector_Enable{Enable: true}},
@@ -152,9 +166,11 @@ func (q Qdrant) SimilaritySearch(ctx context.Context, query string) ([]schema.Do
 	})
 
 	if searchResult == nil || searchResult.Result == nil {
+		fmt.Println(searchResult.GetTime())
 		return nil, nil
 	}
-	fmt.Println(searchResult)
+	fmt.Println(searchResult.GetTime())
+	fmt.Println(searchResult.GetResult())
 	return q.toSchemaDocs(searchResult), nil
 }
 

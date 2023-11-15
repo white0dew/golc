@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hupe1980/golc/rag"
-
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/model"
 	"github.com/hupe1980/golc/prompt"
+	"github.com/hupe1980/golc/rag"
 	"github.com/hupe1980/golc/schema"
 	"github.com/hupe1980/golc/tool"
 )
@@ -26,6 +25,7 @@ type OpenAIFunctionsOptions struct {
 	MaxIterations             int
 	RetrievalQAOptionsOptions *rag.RetrievalQAOptions
 	Retriever                 schema.Retriever
+	MaxTokenLimit             uint
 }
 
 // OpenAIFunctions is an agent that uses OpenAI chatModels and schema.Tools to perform actions.
@@ -57,6 +57,12 @@ func NewOpenAIFunctions(model schema.ChatModel, tools []schema.Tool, optFns ...f
 		return nil, errors.New("agent only supports OpenAI chatModels")
 	}
 
+	//// 获取相关文档
+	//docs, err := a.getDocuments(context.Background(), question, opts)
+	//if err != nil {
+	//	return nil, err
+	//}
+
 	// 插件系统
 	functions := make([]schema.FunctionDefinition, len(tools))
 	for i, t := range tools {
@@ -67,7 +73,6 @@ func NewOpenAIFunctions(model schema.ChatModel, tools []schema.Tool, optFns ...f
 
 		functions[i] = *f
 	}
-
 	agent := &OpenAIFunctions{
 		model:     model,
 		functions: functions,
@@ -163,3 +168,36 @@ func (a *OpenAIFunctions) constructScratchPad(steps []schema.AgentStep) schema.C
 
 	return messages
 }
+
+//func (a *OpenAIFunctions) getDocuments(ctx context.Context, query string, opts schema.CallOptions) ([]schema.Document, error) {
+//	docs, err := retriever.Run(ctx, a.retriever, query, func(o *retriever.Options) {
+//		o.Callbacks = opts.CallbackManger.GetInheritableCallbacks()
+//		o.ParentRunID = opts.CallbackManger.RunID()
+//	})
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	numDocs := len(docs)
+//
+//	if a.opts.MaxTokenLimit > 0 {
+//		tokens := make([]uint, len(docs))
+//
+//		for i, doc := range docs {
+//			t, err := a.llmChain.GetNumTokens(doc.PageContent)
+//			if err != nil {
+//				return nil, err
+//			}
+//
+//			tokens[i] = t
+//		}
+//
+//		tokenCount := util.SumInt(tokens[:numDocs])
+//		for tokenCount > a.opts.MaxTokenLimit {
+//			numDocs--
+//			tokenCount -= tokens[numDocs]
+//		}
+//	}
+//
+//	return docs[:numDocs], nil
+//}

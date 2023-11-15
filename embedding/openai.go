@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"time"
 
 	"github.com/avast/retry-go"
 	"github.com/hupe1980/go-tiktoken"
@@ -185,6 +186,7 @@ func (e *OpenAI) getLenSafeEmbeddings(ctx context.Context, texts []string) ([][]
 		return nil, err
 	}
 
+	searchNow := time.Now()
 	for i, text := range texts {
 		if strings.HasSuffix(e.opts.ModelName, "001") {
 			// Replace newlines, which can negatively affect performance.
@@ -209,15 +211,19 @@ func (e *OpenAI) getLenSafeEmbeddings(ctx context.Context, texts []string) ([][]
 			indices = append(indices, i)
 		}
 	}
+	util.TimeTrack(searchNow, "all texts")
 
 	batchedEmbeddings := [][]float64{}
 
+	searchNow = time.Now()
 	for i := 0; i < len(tokens); i += e.opts.ChunkSize {
 		limit := i + e.opts.ChunkSize
 		if limit > len(tokens) {
 			limit = len(tokens)
 		}
 
+		embedTime := time.Now()
+		// TODO 这里是不是需要改成try
 		res, err := e.client.CreateEmbeddings(ctx, openai.EmbeddingRequest{
 			Model: nameToOpenAIModel[e.opts.ModelName],
 			Input: tokens[i:limit],
@@ -225,6 +231,7 @@ func (e *OpenAI) getLenSafeEmbeddings(ctx context.Context, texts []string) ([][]
 		if err != nil {
 			return nil, err
 		}
+		util.TimeTrack(embedTime, "embedTime")
 
 		for _, d := range res.Data {
 			batchedEmbeddings = append(batchedEmbeddings, util.Map(d.Embedding, func(e float32, _ int) float64 {
@@ -232,6 +239,7 @@ func (e *OpenAI) getLenSafeEmbeddings(ctx context.Context, texts []string) ([][]
 			}))
 		}
 	}
+	util.TimeTrack(searchNow, "CreateEmbeddings texts")
 
 	results := make([][][]float64, len(texts))
 	numTokensInBatch := make([][]int, len(texts))
@@ -242,14 +250,15 @@ func (e *OpenAI) getLenSafeEmbeddings(ctx context.Context, texts []string) ([][]
 		numTokensInBatch[index] = append(numTokensInBatch[index], len(tokens[i]))
 	}
 
+	embedTime := time.Now()
 	embeddings := make([][]float64, len(texts))
-
 	for i := 0; i < len(texts); i++ {
 		var average []float64
 
 		result := results[i]
 
 		if len(result) == 0 {
+			fmt.Printf("len(result) = 0 ")
 			res, err := e.client.CreateEmbeddings(ctx, openai.EmbeddingRequest{
 				Model: nameToOpenAIModel[e.opts.ModelName],
 				Input: []string{""},
@@ -291,6 +300,6 @@ func (e *OpenAI) getLenSafeEmbeddings(ctx context.Context, texts []string) ([][]
 
 		embeddings[i] = average
 	}
-
+	util.TimeTrack(embedTime, "embedTime")
 	return embeddings, nil
 }
