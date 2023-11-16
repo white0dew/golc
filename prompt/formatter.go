@@ -2,11 +2,11 @@ package prompt
 
 import (
 	"bytes"
+	"fmt"
+	"github.com/Masterminds/sprig/v3"
 	"regexp"
 	"text/template"
 	"text/template/parse"
-
-	"github.com/Masterminds/sprig/v3"
 )
 
 type FormatterOptions struct {
@@ -28,7 +28,11 @@ func NewFormatter(text string, optFns ...func(o *FormatterOptions)) *Formatter {
 		fn(&opts)
 	}
 
-	t := template.Must(template.New("template").Funcs(sprig.FuncMap()).Parse(text))
+	t, err := template.New("template").Funcs(sprig.FuncMap()).Parse(text)
+	if err != nil {
+		fmt.Printf("[NewFormatter] err:%v,text:%v", err, text)
+		t = template.New("template")
+	}
 
 	if !opts.IgnoreMissingKeys {
 		t = t.Option("missingkey=error")
