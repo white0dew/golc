@@ -39,10 +39,10 @@ func NewTemplate(template string, optFns ...func(o *TemplateOptions)) *Template 
 		fn(&opts)
 	}
 
-	if opts.TransformPythonTemplate {
-		re := regexp.MustCompile(`{([^{}]+)}`)
-		template = re.ReplaceAllString(template, "{{.$1}}")
-	}
+	//if opts.TransformPythonTemplate {
+	re := regexp.MustCompile(`{([^{}]+)}`)
+	template = re.ReplaceAllString(template, "{{.$1}}")
+	//}
 
 	return &Template{
 		template: template,
