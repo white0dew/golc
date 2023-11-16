@@ -325,7 +325,7 @@ func (e *OpenAI) getLenEmbeddings(ctx context.Context, texts []string) ([][]floa
 		embedTime := time.Now()
 
 		// TODO 这里是不是需要改成try
-		res, err := e.client.CreateEmbeddings(ctx, openai.EmbeddingRequest{
+		res, err := e.createEmbeddingsWithRetry(ctx, openai.EmbeddingRequest{
 			Model: nameToOpenAIModel[e.opts.ModelName],
 			Input: text,
 		})
