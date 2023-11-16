@@ -209,17 +209,20 @@ func (mt *messageTemplate) FormatPrompt(values map[string]any) (*ChatPromptValue
 // SystemMessageTemplate represents a system message template.
 type SystemMessageTemplate struct {
 	messageTemplate
-	prompt *Template
+	prompt        *Template
+	notNeedFormat bool
 }
 
 // NewSystemMessageTemplate creates a new SystemMessageTemplate with the given template.
-func NewSystemMessageTemplate(template string) *SystemMessageTemplate {
+func NewSystemMessageTemplate(template string, notNeedFormat ...bool) *SystemMessageTemplate {
 	mt := &SystemMessageTemplate{
 		prompt: NewTemplate(template),
 	}
-
 	mt.messageTemplate = messageTemplate{mt}
 
+	for _, v := range notNeedFormat {
+		mt.notNeedFormat = v
+	}
 	return mt
 }
 
@@ -241,22 +244,32 @@ func (pt *SystemMessageTemplate) InputVariables() []string {
 // AIMessageTemplate represents an AI message template.
 type AIMessageTemplate struct {
 	messageTemplate
-	prompt *Template
+	prompt        *Template
+	notNeedFormat bool
+	originText    string
 }
 
 // NewAIMessageTemplate creates a new AIMessageTemplate with the given template.
-func NewAIMessageTemplate(template string) *AIMessageTemplate {
-	mt := &AIMessageTemplate{
-		prompt: NewTemplate(template),
+func NewAIMessageTemplate(template string, notNeedFormat ...bool) *AIMessageTemplate {
+	mt := &AIMessageTemplate{}
+	for _, v := range notNeedFormat {
+		mt.notNeedFormat = v
+		mt.originText = template
 	}
 
+	if !mt.notNeedFormat {
+		mt.prompt = NewTemplate(template)
+	}
 	mt.messageTemplate = messageTemplate{mt}
-
 	return mt
 }
 
 // Format formats the message using the provided values and returns an AIChatMessage.
 func (pt *AIMessageTemplate) Format(values map[string]any) (schema.ChatMessage, error) {
+	if pt.notNeedFormat {
+		return schema.NewAIChatMessage(pt.originText), nil
+	}
+
 	text, err := pt.prompt.Format(values)
 	if err != nil {
 		return nil, err
@@ -267,23 +280,30 @@ func (pt *AIMessageTemplate) Format(values map[string]any) (schema.ChatMessage, 
 
 // InputVariables returns the input variables used in the AI message template.
 func (pt *AIMessageTemplate) InputVariables() []string {
+	if pt.notNeedFormat {
+		return []string{}
+	}
 	return pt.prompt.InputVariables()
 }
 
 // HumanMessageTemplate represents a human message template.
 type HumanMessageTemplate struct {
 	messageTemplate
-	prompt *Template
+	prompt        *Template
+	notNeedFormat bool
 }
 
 // NewHumanMessageTemplate creates a new HumanMessageTemplate with the given template.
-func NewHumanMessageTemplate(template string) *HumanMessageTemplate {
+func NewHumanMessageTemplate(template string, notNeedFormat ...bool) *HumanMessageTemplate {
 	mt := &HumanMessageTemplate{
 		prompt: NewTemplate(template),
 	}
 
 	mt.messageTemplate = messageTemplate{mt}
+	for _, v := range notNeedFormat {
+		mt.notNeedFormat = v
 
+	}
 	return mt
 }
 
@@ -301,3 +321,91 @@ func (pt *HumanMessageTemplate) Format(values map[string]any) (schema.ChatMessag
 func (pt *HumanMessageTemplate) InputVariables() []string {
 	return pt.prompt.InputVariables()
 }
+
+//// AIMessageRaw represents an AI message raw.
+//type AIMessageRaw struct {
+//	messageTemplate
+//	prompt *Template
+//}
+//
+//// NewAIMessageRaw creates a new AIMessageTemplate with the given template.
+//func NewAIMessageRaw(template string) *AIMessageTemplate {
+//	mt := &AIMessageTemplate{
+//		prompt: NewTemplate(template),
+//	}
+//
+//	mt.messageTemplate = messageTemplate{mt}
+//
+//	return mt
+//}
+//
+//// Format formats the message using the provided values and returns an AIChatMessage.
+//func (pt *AIMessageRaw) Format(values map[string]any) (schema.ChatMessage, error) {
+//	text, err := pt.prompt.Format(values)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return schema.NewAIChatMessage(text), nil
+//}
+//
+//// InputVariables returns the input variables used in the AI message template.
+//func (pt *AIMessageRaw) InputVariables() []string {
+//	return pt.prompt.InputVariables()
+//}
+//
+//// SystemMessageRaw represents an AI message raw.
+//type SystemMessageRaw struct {
+//	messageTemplate
+//	prompt     *Template
+//	originText string
+//}
+//
+//// NewSystemMessageRaw creates a new AIMessageTemplate with the given template.
+//func NewSystemMessageRaw(template string) *SystemMessageRaw {
+//	mt := &SystemMessageRaw{
+//		prompt: NewTemplate(template),
+//	}
+//
+//	mt.messageTemplate = messageTemplate{mt}
+//	mt.originText = template
+//	return mt
+//}
+//
+//// Format formats the message using the provided values and returns an AIChatMessage.
+//func (pt *SystemMessageRaw) Format(values map[string]any) (schema.ChatMessage, error) {
+//	return schema.NewSystemChatMessage(), nil
+//}
+//
+//// InputVariables returns the input variables used in the AI message template.
+//func (pt *SystemMessageRaw) InputVariables() []string {
+//	return pt.prompt.InputVariables()
+//}
+//
+//// HumanMessageRaw represents an AI message raw.
+//type HumanMessageRaw struct {
+//	messageTemplate
+//	prompt     *Template
+//	originText string
+//}
+//
+//// NewHumanMessageRaw creates a new AIMessageTemplate with the given template.
+//func NewHumanMessageRaw(template string) *HumanMessageRaw {
+//	mt := &HumanMessageRaw{
+//		prompt: NewTemplate(template),
+//	}
+//
+//	mt.messageTemplate = messageTemplate{mt}
+//	mt.originText = template
+//	return mt
+//}
+//
+//// Format formats the message using the provided values and returns an AIChatMessage.
+//func (pt *HumanMessageRaw) Format(values map[string]any) (schema.ChatMessage, error) {
+//	return schema.NewHumanChatMessage(pt.originText), nil
+//}
+//
+//// InputVariables returns the input variables used in the AI message template.
+//func (pt *HumanMessageRaw) InputVariables() []string {
+//	return pt.prompt.InputVariables()
+//}
