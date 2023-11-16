@@ -211,23 +211,28 @@ type SystemMessageTemplate struct {
 	messageTemplate
 	prompt        *Template
 	notNeedFormat bool
+	originText    string
 }
 
 // NewSystemMessageTemplate creates a new SystemMessageTemplate with the given template.
 func NewSystemMessageTemplate(template string, notNeedFormat ...bool) *SystemMessageTemplate {
-	mt := &SystemMessageTemplate{
-		prompt: NewTemplate(template),
-	}
+	mt := &SystemMessageTemplate{}
 	mt.messageTemplate = messageTemplate{mt}
-
 	for _, v := range notNeedFormat {
 		mt.notNeedFormat = v
+		mt.originText = template
+	}
+	if !mt.notNeedFormat {
+		mt.prompt = NewTemplate(template)
 	}
 	return mt
 }
 
 // Format formats the message using the provided values and returns a SystemChatMessage.
 func (pt *SystemMessageTemplate) Format(values map[string]any) (schema.ChatMessage, error) {
+	if pt.notNeedFormat {
+		return schema.NewSystemChatMessage(pt.originText), nil
+	}
 	text, err := pt.prompt.Format(values)
 	if err != nil {
 		return nil, err
@@ -238,6 +243,9 @@ func (pt *SystemMessageTemplate) Format(values map[string]any) (schema.ChatMessa
 
 // InputVariables returns the input variables used in the system message template.
 func (pt *SystemMessageTemplate) InputVariables() []string {
+	if pt.notNeedFormat {
+		return []string{}
+	}
 	return pt.prompt.InputVariables()
 }
 
@@ -291,24 +299,28 @@ type HumanMessageTemplate struct {
 	messageTemplate
 	prompt        *Template
 	notNeedFormat bool
+	originText    string
 }
 
 // NewHumanMessageTemplate creates a new HumanMessageTemplate with the given template.
 func NewHumanMessageTemplate(template string, notNeedFormat ...bool) *HumanMessageTemplate {
-	mt := &HumanMessageTemplate{
-		prompt: NewTemplate(template),
-	}
-
-	mt.messageTemplate = messageTemplate{mt}
+	mt := &HumanMessageTemplate{}
 	for _, v := range notNeedFormat {
 		mt.notNeedFormat = v
-
+		mt.originText = template
+	}
+	mt.messageTemplate = messageTemplate{mt}
+	if !mt.notNeedFormat {
+		mt.prompt = NewTemplate(template)
 	}
 	return mt
 }
 
 // Format formats the message using the provided values and returns a HumanChatMessage.
 func (pt *HumanMessageTemplate) Format(values map[string]any) (schema.ChatMessage, error) {
+	if pt.notNeedFormat {
+		return schema.NewHumanChatMessage(pt.originText), nil
+	}
 	text, err := pt.prompt.Format(values)
 	if err != nil {
 		return nil, err
@@ -319,6 +331,9 @@ func (pt *HumanMessageTemplate) Format(values map[string]any) (schema.ChatMessag
 
 // InputVariables returns the input variables used in the human message template.
 func (pt *HumanMessageTemplate) InputVariables() []string {
+	if pt.notNeedFormat {
+		return []string{}
+	}
 	return pt.prompt.InputVariables()
 }
 
