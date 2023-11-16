@@ -228,11 +228,11 @@ func (e *OpenAI) getLenSafeEmbeddings(ctx context.Context, texts []string) ([][]
 
 		embedTime := time.Now()
 		// TODO 这里是不是需要改成try
-		fmt.Printf("[CreateEmbeddings] req:%v", openai.EmbeddingRequest{
-			Model: nameToOpenAIModel[e.opts.ModelName],
-			//Input: tokens[i:limit],
-			Input: tokens[i:limit],
-		})
+		//fmt.Printf("[CreateEmbeddings] req:%v", openai.EmbeddingRequest{
+		//	Model: nameToOpenAIModel[e.opts.ModelName],
+		//	//Input: tokens[i:limit],
+		//	Input: tokens[i:limit],
+		//})
 		res, err := e.client.CreateEmbeddings(ctx, openai.EmbeddingRequest{
 			Model: nameToOpenAIModel[e.opts.ModelName],
 			Input: tokens[i:limit],
@@ -334,7 +334,6 @@ func (e *OpenAI) getLenEmbeddings(ctx context.Context, texts []string) ([][]floa
 		}
 		if len(res.Data) != 0 {
 			for _, d := range res.Data {
-				fmt.Println(d.Embedding)
 				embedding = append(embedding, util.Map(d.Embedding, func(e float32, _ int) float64 {
 					return float64(e)
 				}))
@@ -379,7 +378,7 @@ func (e *OpenAI) getLenSafeEmbeddingsWithString(ctx context.Context, texts []str
 			indices = append(indices, i)
 		}
 	}
-	fmt.Printf("tokens list:%v", tokens)
+	//fmt.Printf("tokens list:%v", tokens)
 
 	batchedEmbeddings := [][]float64{}
 
@@ -392,11 +391,11 @@ func (e *OpenAI) getLenSafeEmbeddingsWithString(ctx context.Context, texts []str
 
 		embedTime := time.Now()
 		// TODO 这里是不是需要改成try
-		fmt.Printf("[CreateEmbeddings] req:%v", openai.EmbeddingRequest{
-			Model: nameToOpenAIModel[e.opts.ModelName],
-			//Input: tokens[i:limit],
-			Input: tokens[i:limit],
-		})
+		//fmt.Printf("[CreateEmbeddings] req:%v", openai.EmbeddingRequest{
+		//	Model: nameToOpenAIModel[e.opts.ModelName],
+		//	//Input: tokens[i:limit],
+		//	Input: tokens[i:limit],
+		//})
 		res, err := e.client.CreateEmbeddings(ctx, openai.EmbeddingRequest{
 			Model: nameToOpenAIModel[e.opts.ModelName],
 			Input: tokens[i:limit],
