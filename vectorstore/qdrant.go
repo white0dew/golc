@@ -66,9 +66,6 @@ func (q Qdrant) AddDocuments(ctx context.Context, docs []schema.Document) error 
 	}
 	defer conn.Close()
 
-	// create grpc collection client
-	//collections_client := pb.NewCollectionsClient(conn)
-
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -108,10 +105,11 @@ func (q Qdrant) SimilaritySearch(ctx context.Context, query string) ([]schema.Do
 	if err != nil {
 		return nil, err
 	}
+	//fmt.Println(vector)
 	newVector := util.Map(vector, func(e float64, i int) float32 {
 		return float32(e)
 	})
-
+	//fmt.Println(newVector)
 	// 检查groupId
 	if q.opts.GroupId == 0 {
 		return nil, errors.New("group is empty")
@@ -139,20 +137,6 @@ func (q Qdrant) SimilaritySearch(ctx context.Context, query string) ([]schema.Do
 							Match: &pb.Match{
 								MatchValue: &pb.Match_Integer{
 									Integer: int64(q.opts.GroupId),
-								},
-							},
-						},
-					},
-				},
-			},
-			Should: []*pb.Condition{
-				{
-					ConditionOneOf: &pb.Condition_Field{
-						Field: &pb.FieldCondition{
-							Key: "md5",
-							Match: &pb.Match{
-								MatchValue: &pb.Match_Keywords{
-									Keywords: &pb.RepeatedStrings{Strings: []string{"345418557abc9fd665f6679e1cbf4db9", "ff77b2c1cf775c80e751ac328d1ba2ab"}},
 								},
 							},
 						},
