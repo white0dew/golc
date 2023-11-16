@@ -312,7 +312,6 @@ func main1() {
 }
 
 func main() {
-	//key:=os.Getenv("OpenaiKey")
 	key := ""
 	openai, err := embedding.NewOpenAI(key, func(o *embedding.OpenAIOptions) {
 		o.BaseURL = "https://35.nekoapi.com/v1"

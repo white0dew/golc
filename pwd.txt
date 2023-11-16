@@ -1,0 +1,15 @@
+key := "sk-peisUrRs7gPLZKPk3c758475E6604f87B427Df3f4f34Cd45"
+	openai, err := embedding.NewOpenAI(key, func(o *embedding.OpenAIOptions) {
+		o.BaseURL = "https://35.nekoapi.com/v1"
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	qdrant, err := vectorstore.NewQdrant(openai, "text", func(options *vectorstore.QdrantOptions) {
+		options.GroupId = 1
+		options.TopK = 3
+		options.AddrPort = "aistar.cool:6334"
+		options.CollectionName = "aistar"
+		options.ScoreThreshold = 0.5
+	})
