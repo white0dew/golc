@@ -114,7 +114,10 @@ func (a *OpenAIFunctions) Plan(ctx context.Context, intermediateSteps []schema.A
 			return nil, nil, err
 		}
 
-		// 当前消息
+		// 当前用户问题
+		promptMessages = append(promptMessages, schema.NewHumanChatMessage(inputs["input"].(string)))
+
+		// 当前步骤
 		promptMessages = append(promptMessages, stepMessage...)
 	}
 
