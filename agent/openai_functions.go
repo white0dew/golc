@@ -26,6 +26,7 @@ type OpenAIFunctionsOptions struct {
 	RetrievalQAOptionsOptions *rag.RetrievalQAOptions
 	Retriever                 schema.Retriever
 	MaxTokenLimit             uint
+	ChatMessageHistory        schema.ChatMessageHistory
 }
 
 // OpenAIFunctions is an agent that uses OpenAI chatModels and schema.Tools to perform actions.
@@ -87,23 +88,37 @@ func NewOpenAIFunctions(model schema.ChatModel, tools []schema.Tool, optFns ...f
 // Plan executes the agent with the given context, intermediate steps, and inputs.
 // It returns the agent actions, agent finish, or an error, if any.
 func (a *OpenAIFunctions) Plan(ctx context.Context, intermediateSteps []schema.AgentStep, inputs schema.ChainValues) ([]*schema.AgentAction, *schema.AgentFinish, error) {
-	inputs["agentScratchpad"] = a.constructScratchPad(intermediateSteps)
+	var promptMessages schema.ChatMessages
+	var err error
+	stepMessage := a.constructScratchPad(intermediateSteps)
+	if a.opts.ChatMessageHistory == nil { // 模板化
+		inputs["agentScratchpad"] = stepMessage
+		templates := []prompt.MessageTemplate{a.opts.SystemMessage}
+		templates = append(templates, a.opts.ExtraMessages...)
+		templates = append(templates, prompt.NewHumanMessageTemplate("{{.input}}"))
 
-	templates := []prompt.MessageTemplate{a.opts.SystemMessage}
-	templates = append(templates, a.opts.ExtraMessages...)
-	templates = append(templates, prompt.NewHumanMessageTemplate("{{.input}}"))
+		chatTemplate := prompt.NewChatTemplate(templates)
 
-	chatTemplate := prompt.NewChatTemplate(templates)
+		placeholder := prompt.NewMessagesPlaceholder("agentScratchpad")
 
-	placeholder := prompt.NewMessagesPlaceholder("agentScratchpad")
+		wrapper := prompt.NewChatTemplateWrapper(chatTemplate, placeholder)
+		prompt, err := wrapper.FormatPrompt(inputs)
+		if err != nil {
+			return nil, nil, err
+		}
+		promptMessages = prompt.Messages()
+	} else { // 非模板化
+		// 历史消息
+		promptMessages, err = a.opts.ChatMessageHistory.Messages(ctx)
+		if err != nil {
+			return nil, nil, err
+		}
 
-	wrapper := prompt.NewChatTemplateWrapper(chatTemplate, placeholder)
-	prompt, err := wrapper.FormatPrompt(inputs)
-	if err != nil {
-		return nil, nil, err
+		// 当前消息
+		promptMessages = append(promptMessages, stepMessage...)
 	}
 
-	result, err := model.ChatModelGenerate(ctx, a.model, prompt.Messages(), func(o *model.Options) {
+	result, err := model.ChatModelGenerate(ctx, a.model, promptMessages, func(o *model.Options) {
 		o.Functions = a.functions
 	})
 	if err != nil {
