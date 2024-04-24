@@ -215,7 +215,7 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 
 				// 防止有空的
 				if len(res.Choices) == 0 {
-					fmt.Println(utils.ToString(res))
+					fmt.Printf("[Golc inner streamProcessing empty] res :%v, err: %v", utils.ToString(res), err)
 					return nil, errors.New("系统开小差啦,不知道怎么回答")
 				}
 
