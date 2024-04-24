@@ -14,6 +14,10 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+examples/test_qdrant
+examples/test_function
+examples/test_openapi
+examples/test_new_tools
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
@@ -26,3 +30,5 @@ TODO.md
 ./examples/test_qdrant/*
 
 ./pwd.txt
+./tool/image
+./examples

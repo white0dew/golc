@@ -20,9 +20,9 @@ require (
 	github.com/go-rod/stealth v0.4.9
 	github.com/gofiber/fiber/v2 v2.50.0
 	github.com/googleapis/gax-go/v2 v2.12.0
-	github.com/karust/openserp v0.2.1
 	github.com/olahol/melody v1.1.4
-	github.com/sashabaranov/go-openai v1.17.3
+	github.com/qdrant/go-client v1.6.0
+	github.com/sashabaranov/go-openai v1.23.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	github.com/weaviate/weaviate v1.21.8
@@ -56,6 +56,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect
@@ -88,7 +89,6 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/qdrant/go-client v1.6.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/skeema/knownhosts v1.2.1 // indirect

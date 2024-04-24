@@ -21,10 +21,10 @@ type Data struct {
 }
 
 func main() {
-	openai, err := chatmodel.NewOpenAI("sk-6TQ9GKHl4pmGW024E9Fc582aF449407183B3Cb0aB2360e2c", func(o *chatmodel.OpenAIOptions) {
+	openai, err := chatmodel.NewOpenAI("sk-peisUrRs7gPLZKPk3c758475E6604f87B427Df3f4f34Cd45", func(o *chatmodel.OpenAIOptions) {
 		o.Stream = true
-		o.ModelName = openai.GPT4VisionPreview
-		o.BaseURL = "https://api.rcouyi.com/v1"
+		o.ModelName = string(openai.TTSModel1)
+		o.BaseURL = "https://35.nekoapi.com/v1"
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -41,6 +41,7 @@ func main() {
 			ImageURL: "https://lmg.jj20.com/up/allimg/tp05/1Z9291T012CB-0-lp.jpg",
 		},
 	})
+
 	res, _ := openai.Generate(context.Background(), schema.ChatMessages{
 		schema.NewHumanChatMessage(
 			string(content)),

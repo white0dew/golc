@@ -3,7 +3,9 @@ package chatmodel
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/avast/retry-go"
+	"github.com/emirpasic/gods/utils"
 	"github.com/hupe1980/golc"
 	"github.com/hupe1980/golc/callback"
 	"github.com/hupe1980/golc/integration"
@@ -210,11 +212,10 @@ func (cm *OpenAI) Generate(ctx context.Context, messages schema.ChatMessages, op
 				if err != nil {
 					return nil, err
 				}
-				//resR, _ := json.Marshal(res.Choices)
-				//fmt.Println(string(resR))
 
 				// 防止有空的
 				if len(res.Choices) == 0 {
+					fmt.Println(utils.ToString(res))
 					return nil, errors.New("系统开小差啦,不知道怎么回答")
 				}
 

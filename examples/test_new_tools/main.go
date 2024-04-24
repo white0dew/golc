@@ -12,7 +12,7 @@ import (
 	"log"
 )
 
-func main() {
+func main1() {
 	golc.Verbose = true
 
 	// os.Getenv("openai_key")
@@ -58,5 +58,3 @@ func main() {
 
 	fmt.Println(result)
 }
-
-//Navigate to https://yqsas.com/2019/03/21/how-to-develop-forked-go-project/ and summarize the text

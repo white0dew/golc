@@ -3,6 +3,7 @@ package tool
 
 import (
 	"context"
+	"github.com/gofiber/fiber/v2/log"
 	"reflect"
 
 	"github.com/hupe1980/golc/callback"
@@ -94,10 +95,13 @@ func ToFunction(t schema.Tool) (*schema.FunctionDefinition, error) {
 		return function, nil
 	}
 
+	//log.Infof("[ToFunction] argsType:%+v", argsType)
 	jsonSchema, err := jsonschema.Generate(argsType)
 	if err != nil {
+		log.Warnf("[jsonschema.Generate] failed to generate json schema for %s: %s", t.Name(), err)
 		return nil, err
 	}
+	//log.Infof("[ToFunction] jsonSchema:%+v", util.ToString(jsonSchema))
 
 	function.Parameters = schema.FunctionDefinitionParameters{
 		Type:       "object",

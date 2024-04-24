@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func main1() {
+func main() {
 	query := core.Query{
 		Text:  "哈哈",
 		Limit: 10,
